@@ -69,7 +69,7 @@ class DuoLogstalgia(object):
     def __call__(self):
         """ """
 
-        interval = 15  # How often to pull logs in seconds.
+        interval = 60  # How often to pull logs in seconds.
         mintime = time.time() - interval
 
         while True:
