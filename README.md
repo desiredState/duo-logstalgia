@@ -3,8 +3,6 @@
 ### Usage 
 
 ```bash
-#!/usr/bin/env bash
-
 docker build -t duo-logstalgia:latest . && \
 docker run --rm \
     -e DUO_IKEY='<CHANGE_ME>' \
