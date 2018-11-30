@@ -10,5 +10,5 @@ docker run --rm \
     -e DUO_HOST='<CHANGE_ME>' \
     duo-logstalgia:latest | \
     tee /dev/tty | \
-    logstalgia -x -g "Duo Access Log,CODE=.*?,100" --sync
+    logstalgia -x -g "Duo Access Log,CODE=.*?,100" -
 ```
