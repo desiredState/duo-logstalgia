@@ -8,6 +8,7 @@ See README.md for documentation.
 import logging
 import os
 import pprint
+import socket
 import sys
 import time
 
@@ -15,7 +16,6 @@ import duo_client
 
 from lib.logger import Logger
 
-# Initialise a global logger.
 try:
     logger = logging.getLogger('duo_logstalgia')
     logger.setLevel(logging.INFO)
@@ -36,10 +36,10 @@ class DuoLogstalgia(object):
     """ Streams Duo Authentication Logs to Logstalgia Custom Log Format. """
 
     def __init__(self):
-        """ """
-
         self.logger = Logger()
         self.pp = pprint.PrettyPrinter(indent=4)
+
+        socket.setdefaulttimeout(5.0)
 
         # Get Duo API key environment variables.
         try:
@@ -67,8 +67,6 @@ class DuoLogstalgia(object):
             sys.exit(1)
 
     def __call__(self):
-        """ """
-
         interval = 60  # How often to pull logs in seconds.
         mintime = time.time() - interval
 
@@ -82,13 +80,13 @@ class DuoLogstalgia(object):
                     formatted_line = self.format_as_logstalgia(line)
                     print(formatted_line)
 
-            # Fail silently and re-try next time as to not confuse Logstalgia.
-            except Exception as e:
-                print(e)
+                time.sleep(interval)
 
-            time.sleep(interval)
+            except:
+                continue
 
-    def format_as_logstalgia(self, line):
+    @staticmethod
+    def format_as_logstalgia(line):
         """
         Convert a Duo Auth Log line to Logstalgia Custom Log Format.
         :param line: (dict) The raw Duo Auth Log line.
@@ -98,20 +96,19 @@ class DuoLogstalgia(object):
         if line['result'] == "SUCCESS":
             response_code = '200'
             success = "1"
-            # response_colour = "#008000"
         else:
             response_code = '500'
             success = "0"
-            # response_colour = "#FF0000"
+
+        try:
+            t_hostname = socket.gethostbyaddr(line['ip'])
+            hostname = t_hostname[0]
+        except:
+            hostname = line['ip']
 
         timestamp = line['timestamp']
-        hostname = line['ip']
         path = line['integration']
         response_size = "1000"
-        # referrer_url =
-        # user_agent =
-        # virtual_host =
-        # pid_other =
 
         formatted_line = "{}|{}|{}|{}|{}|{}".format(
             timestamp,
@@ -119,12 +116,7 @@ class DuoLogstalgia(object):
             path,
             response_code,
             response_size,
-            success,
-            # response_colour,
-            # referrer_url,
-            # user_agent,
-            # virtual_host,
-            # pid_other
+            success
         )
 
         return formatted_line
