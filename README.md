@@ -1,5 +1,7 @@
 # Duo Logstalgia
 
+Streams Duo Authentication Logs to Logstalgia Custom Log Format.
+
 ### Usage 
 
 ```bash
